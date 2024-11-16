@@ -14,6 +14,20 @@ class Polynomial:
 		for term in self.terms:
 			term.differentiate()
 
+	def integrate(self):
+		self.combine_like_terms()
+		for term in self.terms:
+			term.integrate()
+
+	def defintegral(self, a, b):
+		c = Polynomial(copy.deepcopy(self.terms))
+		c.integrate()
+
+		if a > b:
+			a, b = b, a
+
+		return c.eval(b) - c.eval(a)
+
 	def distribute_term(self, dterm):
 		self.combine_like_terms()
 		for term in self.terms:
@@ -50,6 +64,7 @@ class Polynomial:
 			else:
 				new_terms[power] = term.coef
 		self.terms = [PolynomialTerm(new_terms[power], power) for power in new_terms.keys()]
+		self.terms.sort(key=lambda x: x.power, reverse=True)
 
 	def add(self, otherpoly):
 		self.terms += otherpoly.terms

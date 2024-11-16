@@ -18,6 +18,10 @@ class PolynomialTerm:
 		self.coef *= self.power
 		self.power -= 1
 
+	def integrate(self):
+		self.power += 1
+		self.coef /= self.power
+
 	def multiply(self, otherterm):
 		self.coef *= otherterm.coef
 		self.power += otherterm.power
