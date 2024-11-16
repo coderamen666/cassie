@@ -33,7 +33,7 @@ class Constant(Node):
 
 	def eval(self, vdict):
 		if not self.irrational:
-			return self.val
+			return float(self.val)
 		elif self.val == 'e':
 			return math.e
 		elif self.val == 'pi':
