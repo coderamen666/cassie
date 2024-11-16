@@ -5,7 +5,7 @@ from copy import deepcopy
 
 class Node(ABC):
 	@abstractmethod
-	def eval(self):
+	def eval(self, vdict):
 		pass
 
 	@abstractmethod
@@ -31,7 +31,7 @@ class Constant(Node):
 			self.irrational = (val == 'e') or (val == 'pi') or ("sqrt" in val) or ("ln" in val)
 			self.symbolic_constant = True
 
-	def eval(self):
+	def eval(self, vdict):
 		if not self.irrational:
 			return self.val
 		elif self.val == 'e':
@@ -70,8 +70,10 @@ class Variable(Node):
 		else:
 			return VariablePrime(self.name, 1, wrt)
 
-	def eval(self):
-		pass
+	def eval(self, vdict):
+		if self.name in vdict:
+			return vdict[self.name]
+		return 0
 
 	def dispstr(self):
 		return self.name
@@ -90,10 +92,10 @@ class VariablePrime(Variable):
 			cp = deepcopy(self)
 			cp.order += 1
 		else:
-			return NotImplementedError
+			raise NotImplementedError
 
-	def eval(self):
-		pass
+	def eval(self, vdict):
+		raise NotImplementedError
 
 	def dispstr(self):
 		o = str(self.order) if self.order != 1 else ""

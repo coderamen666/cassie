@@ -5,7 +5,7 @@ from cassie.tree.nodes import *
 
 class Operator(ABC):
 	@abstractmethod
-	def eval(self):
+	def eval(self, vdict):
 		pass
 
 class Addition(Operator):
@@ -13,8 +13,8 @@ class Addition(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() + self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) + self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		n1 = deepcopy(self.node1)
@@ -98,8 +98,8 @@ class Subtraction(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() - self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) - self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		n1 = deepcopy(self.node1)
@@ -127,8 +127,8 @@ class Equals(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() == self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) == self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		n1 = deepcopy(self.node1)
@@ -149,8 +149,8 @@ class Multiplication(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() * self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) * self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		is_n1_const = Constant.is_const(self.node1)
@@ -242,8 +242,8 @@ class Division(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() / self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) / self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		n1 = deepcopy(self.node1)
@@ -283,8 +283,8 @@ class Exponentation(Operator):
 		self.node1 = n1
 		self.node2 = n2
 
-	def eval(self):
-		return self.node1.eval() ** self.node2.eval()
+	def eval(self, vdict):
+		return self.node1.eval(vdict) ** self.node2.eval(vdict)
 
 	def differentiate(self, wrt):
 		is_n1_const = Constant.is_const(self.node1)
@@ -372,8 +372,8 @@ class Negation(Operator):
 	def __init__(self, n1):
 		self.node1 = n1
 
-	def eval(self):
-		return 0 - self.node1.eval()
+	def eval(self, vdict):
+		return 0 - self.node1.eval(vdict)
 
 	def differentiate(self, wrt):
 		n1 = deepcopy(self.node1)
@@ -394,8 +394,8 @@ class NaturalLogarithm(Operator):
 	def __init__(self, n1):
 		self.node1 = n1
 
-	def eval(self):
-		return math.log(self.node1.eval())
+	def eval(self, vdict):
+		return math.log(self.node1.eval(vdict))
 
 	def differentiate(self, wrt):
 		is_n1_const = Constant.is_const(self.node1)
@@ -419,8 +419,8 @@ class Sine(Operator):
 	def __init__(self, n1):
 		self.node1 = n1
 
-	def eval(self):
-		return math.sin(self.node1.eval())
+	def eval(self, vdict):
+		return math.sin(self.node1.eval(vdict))
 
 	def differentiate(self, wrt):
 		is_n1_const = Constant.is_const(self.node1)
@@ -444,8 +444,8 @@ class Cosine(Operator):
 	def __init__(self, n1):
 		self.node1 = n1
 
-	def eval(self):
-		return math.cos(self.node1.eval())
+	def eval(self, vdict):
+		return math.cos(self.node1.eval(vdict))
 
 	def differentiate(self, wrt):
 		is_n1_const = Constant.is_const(self.node1)
