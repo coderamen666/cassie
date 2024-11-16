@@ -1,0 +1,2 @@
+This is where functionality outside the core routines are stored.
+It currently includes an implementation of maclaurin series in python
