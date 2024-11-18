@@ -1,6 +1,10 @@
+# Subroutines to manipulate polynomials
+# The polynomials are stored as python dictionaries
+# The powers are the keys, and the coefficients are the values
+
 import math
 
-def polyclean(p):
+def polyclean(p): # Cleans out powers with null coefficients
 	if p == {}:
 		return {}
 	else:
@@ -10,22 +14,22 @@ def polyclean(p):
 				out[power] = p[power]
 		return out
 
-def polyzero(p):
+def polyzero(p): # Checks if polynomial is zero
 	tmp = polyclean(p)
 	return tmp == {}
 
-def polyeq(p1, p2):
+def polyeq(p1, p2): # Checks if 2 polynomials are equal
 	p1, p2 = polyclean(p1), polyclean(p2)
 	return polyzero(subpolys(p1, p2))
 
-def degree(poly):
+def degree(poly): # Finds the highest power of the polynomial
 	poly = polyclean(poly)
 	return 0 if polyzero(poly) else max(poly.keys())
 
-def lcoef(poly):
+def lcoef(poly): # Finds leading coefficient
 	return poly[degree(poly)]
 
-def negate(poly):
+def negate(poly): # Additive inverse function
 	poly = polyclean(poly)
 	if polyzero(poly):
 		return {}
@@ -34,7 +38,7 @@ def negate(poly):
 		result[power] = -poly[power]
 	return polyclean(result)
 
-def evalpoly(poly, x):
+def evalpoly(poly, x): # "Plugs in" value into polynomial
 	poly = polyclean(poly)
 	if polyzero(poly):
 		return 0
@@ -43,7 +47,7 @@ def evalpoly(poly, x):
 		out += poly[power] * (x ** power)
 	return out
 
-def addpolys(polys):
+def addpolys(polys): # Adds a list of polynomials together
 	result = {}
 	for poly in polys:
 		poly = polyclean(poly)
@@ -55,7 +59,7 @@ def addpolys(polys):
 			result[power] += poly[power]
 	return polyclean(result)
 
-def subpolys(p1, p2):
+def subpolys(p1, p2): # Subtracts 2 polynomials
 	p1, p2 = polyclean(p1), polyclean(p2)
 	result = dict(p1)
 	if polyzero(p2):
@@ -69,7 +73,7 @@ def subpolys(p1, p2):
 			result[power] -= p2[power]
 		return polyclean(result)
 
-def distmon(poly, monomial):
+def distmon(poly, monomial): # Distributes monomial across polynomial
 	poly = polyclean(poly)
 	if polyzero(poly) or polyzero(monomial):
 		return {}
@@ -82,7 +86,7 @@ def distmon(poly, monomial):
 		result[new_power] = new_coef
 	return polyclean(result)
 
-def divmon(poly, monomial):
+def divmon(poly, monomial): # Divides polynomial by monomial
 	poly = polyclean(poly)
 	if polyzero(poly):
 		return {}
@@ -98,7 +102,7 @@ def divmon(poly, monomial):
 			result[new_power] = new_coef
 		return polyclean(result)
 
-def polymult(p1, p2):
+def polymult(p1, p2): # Multiplies 2 polynomials together
 	p1, p2 = polyclean(p1), polyclean(p2)
 	if polyzero(p1) or polyzero(p2):
 		return {}
@@ -109,7 +113,7 @@ def polymult(p1, p2):
 			intermediates.append(distmon(p1, monomial))
 		return addpolys(intermediates)
 
-def scalepoly(poly, s):
+def scalepoly(poly, s): # Multiplies polynomial by number
 	out = {}
 	poly = polyclean(poly)
 
@@ -118,7 +122,7 @@ def scalepoly(poly, s):
 
 	return out
 
-def diffpoly(poly):
+def diffpoly(poly): # Finds the derivative of a given polynomial
 	poly = polyclean(poly)
 	out = {}
 	if polyzero(poly):
@@ -130,7 +134,7 @@ def diffpoly(poly):
 			out[power - 1] = poly[power] * power
 	return polyclean(out)
 
-def intpoly(poly, initial_value = None):
+def intpoly(poly, initial_value = None): # Finds the integral of a polynomial
 	poly = polyclean(poly)
 	out = {}
 	if not polyzero(poly):
@@ -146,21 +150,25 @@ def intpoly(poly, initial_value = None):
 		out[0] = inity - evalpoly(out, initx)
 	return polyclean(out)
 
-def dispstr(poly):
+def dispstr(poly): # Displays polynomials in a pretty format
 	poly = polyclean(poly)
 	strterms = []
-	for power in sorted(poly.keys()):
+	for power in sorted(poly.keys(), reverse=True):
 		if poly[power] == 0:
 			continue
 		elif power == 0:
 			strterms.append(str(poly[power]))
+		elif (poly[power] == 1) and (power == 1):
+			strterms.append('x')
+		elif poly[power] == 1:
+			strterms.append(f"x^{power}")
 		elif power == 1:
 			strterms.append(f"{poly[power]}x")
 		else:
 			strterms.append(f"{poly[power]}x^{power}")
 	return ' + '.join(strterms)
 
-def _polydiv(n, d):
+def _polydiv(n, d): # Extended synthetic division (internal alg.)
 	out = list(n)
 	normalizer = d[0]
 	for i in range(len(n) - len(d) + 1):
@@ -172,19 +180,19 @@ def _polydiv(n, d):
 	separator = 1 - len(d)
 	return out[:separator], out[separator:]
 
-def _ltodict(l):
+def _ltodict(l): # Internal function for dividing algorithm
 	out = {}
 	for i in range(0, len(l)):
 		out[i] = l[i]
 	return out
 
-def _dicttol(d):
+def _dicttol(d): # Another internal function
 	l = [0 for i in range(0, max(d.keys()) + 1)]
 	for key in d:
 		l[key] = d[key]
 	return l
 
-def polydiv(n, d):
+def polydiv(n, d): # User facing division function
 	n, d = polyclean(n), polyclean(d)
 	for poly in [n, d]:
 		for power in poly:
@@ -200,17 +208,17 @@ def polydiv(n, d):
 		q, r = _polydiv(_n, _d)
 		return (polyclean(_ltodict(q[::-1])), polyclean(_ltodict(r[::-1])))
 
-def factor_out(poly):
+def factor_out(poly): # Factors out monomial
 	tmp = {min(poly.keys()) : math.gcd(*poly.values())}
 	return (tmp, divmon(poly, tmp))
 
-def factors(n1):
+def factors(n1): # Finds the factors of a positive number
 	n = int(n1)
 	if n == 1:
 		return [1]
 	return [i for i in range(1, n) if (n%i)==0]
 
-def _polyfactor(poly):
+def _polyfactor(poly): # Finds linear factors with the rational root theorem
 	poly = polyclean(poly)
 	cterm = poly[0] if 0 in poly.keys() else 0
 	lc = lcoef(poly)
@@ -241,13 +249,48 @@ def _polyfactor(poly):
 		else:
 			return tuple(facts)
 
-def polyfactor(poly):
+def polyfactor(poly): # User facing factoring function
 	f1, p2 = factor_out(poly)
 	facts = list(_polyfactor(p2))
 	facts = list(facts) + [f1]
 	return facts
 
-p = {4:1, 3:14, 2:1, 1: -336, 0:540}
+def factlist(facts):
+	out = ""
+	for fact in facts:
+		out += f'({dispstr(fact)})'
+	return out
+
+def parseterm(strterm):
+	strterm = strterm.replace("*", "")
+	if (len(strterm) == 1) and strterm.isalpha():
+		return {1 : 1}
+
+	try:
+		coef = int(strterm)
+		power = 0
+		return  {power : coef}
+	except ValueError:
+		if '^' in strterm:
+			tmp = strterm.split('^')
+			power = int(tmp[-1])
+			try:
+				coef = int(tmp[0][:-1])
+			except:
+				coef = 1
+		else:
+			power = 1
+			coef = int(strterm[:-1])
+
+	return {power : coef}
+
+def parseequ(equ):
+	try:
+		return addpolys([parseterm(strterm.replace(" ", '')) for strterm in equ.replace('-', '+-').split("+")])
+	except:
+		return addpolys([parseterm(strterm.replace(" ", '')) for strterm in equ.split("+")])
+
+p = parseequ(input())
+p = {5: 1, 4: -1, 3: -101, 2: 189, 1: 828, 0: -1620}
 fs = polyfactor(p)
-for f in fs:
-	print(dispstr(f))
+print(factlist(fs))
